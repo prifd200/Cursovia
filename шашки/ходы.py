@@ -32,6 +32,18 @@ class Game:
             return True
         return False
 
+    def move(self, lines, col):
+        piece = self.board.get_piece(lines, col)
+        if self.selected and piece == 0 and (lines, col) in self.valid_moves:
+            self.board.move(self.selected, lines, col)
+            skipped = self.valid_moves[(lines, col)]
+            if skipped:
+                self.board.remove(skipped)
+            self.change_turn()
+        else:
+            return False
+        return True
+
     def draw_moves(self, moves):
         for move in moves:
             lines, col = move
@@ -44,17 +56,12 @@ class Game:
         else:
             self.turn = Grey
 
-    def move(self, lines, col):
-        piece = self.board.get_piece(lines, col)
-        if self.selected and piece == 0 and (lines, col) in self.valid_moves:
-            self.board.move(self.selected, lines, col)
-            skipped = self.valid_moves[(lines, col)]
-            if skipped:
-                self.board.remove(skipped)
-            self.change_turn()
-        else:
-            return False
-        return True
+    def get_board(self):
+        return self.board
+
+    def bot(self, board):
+        self.board = board
+        self.change_turn()
 
 
 

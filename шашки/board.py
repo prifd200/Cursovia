@@ -13,6 +13,17 @@ class Board:
             for col in range (lines % 2, Columns, 2):
                 pygame.draw.rect(win, WHIT, (lines*Rectangle, col*Rectangle, Rectangle, Rectangle))
 
+    def evaluate(self):
+        return self.white_left - self.grey_left + (self.white_queen * 0.5 - self.grey_queen * 0.5)
+
+    def get_all_pieces(self, color):
+        pieces = []
+        for line in self.board:
+            for piece in line:
+                if piece != 0 and piece.color == color:
+                    pieces.append(piece)
+        return pieces
+
     #Фигуры
     def move(self, Piece, lines, col ):
         self.board[Piece.lines][Piece.col], self.board[lines][col] =self.board[lines][col], self.board[Piece.lines][Piece.col]
@@ -66,19 +77,19 @@ class Board:
         moves = {}
         left = piece.col - 1
         right = piece.col + 1
-        lines = piece.lines
+        line = piece.lines
         if piece.color == Grey or piece.queen:
-            moves.update(self.Left(lines - 1, max(lines - 4, -1), -1, piece.color, left ))
-            moves.update(self.Right(lines - 1, max(lines - 4, -1), -1, piece.color, right))
+            moves.update(self.Left(line - 1, max(line - 3, -1), -1, piece.color, left))
+            moves.update(self.Right(line - 1, max(line - 3, -1), -1, piece.color, right))
         if piece.color == White or piece.queen:
-            moves.update(self.Left(lines + 1, min(lines + 4, Lines), 1, piece.color, left))
-            moves.update(self.Right(lines + 1, min(lines + 4, Lines), 1, piece.color, right))
+            moves.update(self.Left(line + 1, min(line + 3, Lines), 1, piece.color, left))
+            moves.update(self.Right(line + 1, min(line + 3, Lines), 1, piece.color, right))
         return moves
 
     def Left(self, start, stop,step, color, left, skipped=[]):
         moves = {}
         last = []
-        for i in range (start,stop,step):
+        for i in range(start, stop, step):
             if left < 0:
                 break
             current = self.board[i][left]
@@ -86,24 +97,24 @@ class Board:
                 if skipped and not last:
                     break
                 elif skipped:
-                    moves[(i,left)] = last + skipped
+                    moves[(i, left)] = last + skipped
                 else:
                     moves[(i, left)] = last
                 if last:
                     if step == -1:
-                        lines = max(i-3, 0)
+                        line = max(i - 3, 0)
                     else:
-                        lines = min(i+3, Lines)
-                    moves.update(self.Left(i + step, lines, step, color, left-1, skipped=last))
-                    moves.update(self.Right(i + step, lines, step, color, left + 1, skipped=last))
+                        line = min(i + 3, Lines)
+                    moves.update(self.Left(i + step, line, step, color, left - 1, skipped=last))
+                    moves.update(self.Right(i + step, line, step, color, left + 1, skipped=last))
                 break
-
             elif current.color == color:
                 break
             else:
                 last = [current]
             left -= 1
         return moves
+
     def Right(self, start, stop, step, color, right, skipped=[]):
         moves = {}
         last = []
@@ -120,13 +131,12 @@ class Board:
                     moves[(i, right)] = last
                 if last:
                     if step == -1:
-                        lines = max(i - 3, 0)
+                        line = max(i - 3, 0)
                     else:
-                        lines = min(i + 3, Lines)
-                    moves.update(self.Left(i + step, lines, step, color, right - 1, skipped=last))
-                    moves.update(self.Right(i + step, lines, step, color, right + 1, skipped=last))
+                        line = min(i + 3, Lines)
+                    moves.update(self.Left(i + step, line, step, color, right - 1, skipped=last))
+                    moves.update(self.Right(i + step, line, step, color, right + 1, skipped=last))
                 break
-
             elif current.color == color:
                 break
             else:
