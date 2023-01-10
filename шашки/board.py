@@ -7,6 +7,16 @@ class Board:
         self.grey_left = self.white_left = 12
         self.grey_queen = self.white_queen = 0
         self.create_board()
+    def check_hits(self, colour):
+        accept = []
+        for piece in self.get_all_pieces(colour):
+            if piece != 0:
+                mvs = self.get_valid_moves(self.get_piece(piece.lines, piece.col))
+                for h in mvs:
+                    if len(mvs[h]) != 0:
+                        accept.append(f"{piece.lines} {piece.col}")
+        return accept
+
     def draw_cubes(self, win):
         win.fill(Black)
         for lines in range(Lines):
@@ -75,8 +85,10 @@ class Board:
 
     def get_valid_moves(self, piece):
         moves = {}
+        alt_moves = {}
         left = piece.col - 1
         right = piece.col + 1
+        must_hit = False
         line = piece.lines
         if piece.color == Grey or piece.queen:
             moves.update(self.Left(line - 1, max(line - 3, -1), -1, piece.color, left))
@@ -84,6 +96,12 @@ class Board:
         if piece.color == White or piece.queen:
             moves.update(self.Left(line + 1, min(line + 3, Lines), 1, piece.color, left))
             moves.update(self.Right(line + 1, min(line + 3, Lines), 1, piece.color, right))
+        for move in moves:
+            if len(moves[move]) != 0:
+                must_hit = True
+                alt_moves[move] = moves[move]
+        if must_hit is True:
+            return alt_moves
         return moves
 
     def Left(self, start, stop,step, color, left, skipped=[]):
@@ -118,6 +136,7 @@ class Board:
     def Right(self, start, stop, step, color, right, skipped=[]):
         moves = {}
         last = []
+        must_hit = False
         for i in range(start, stop, step):
             if right >= Columns:
                 break
@@ -142,6 +161,13 @@ class Board:
             else:
                 last = [current]
             right += 1
+        for move in moves:
+            if len(moves[move]) != 0:
+                must_hit = True
+        if must_hit is True:
+            for move in moves:
+                if len(moves[move]) == 0:
+                    del moves[move]
         return moves
 
 

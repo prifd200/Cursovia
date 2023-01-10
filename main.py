@@ -88,9 +88,8 @@ def main():
                 def nope():
                     window4.close()
                 def yep():
-                    window4.close()
-                    window1.close()
-                    window2.show()
+                    pygame.quit()
+                    sys.exit(app.exec_())
                 form4.pushButton.clicked.connect(yep)
                 form4.pushButton_2.clicked.connect(nope)
 

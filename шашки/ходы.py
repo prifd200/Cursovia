@@ -20,13 +20,14 @@ class Game:
     def winner(self):
         return self.board.winner()
     def select(self, lines, col):
+        mvs = self.board.check_hits(self.turn)
         if self.selected:
             result = self.move(lines, col)
             if not result:
                 self.selected = None
                 self.select(lines, col)
         piece = self.board.get_piece(lines, col)
-        if piece != 0 and piece.color == self.turn:
+        if piece != 0 and piece.color == self.turn and (f"{lines} {col}" in mvs and len(mvs) != 0 or len(mvs) == 0):
             self.selected = piece
             self.valid_moves = self.board.get_valid_moves(piece)
             return True
